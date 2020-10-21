@@ -1,0 +1,340 @@
+---
+title: ''
+output: 
+  html_document
+params:
+  year:
+    input: slider
+    label: "Year"
+    value: 2020
+    min: 2019
+    max: 2099
+    step: 1
+    sep: ""
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+# load libraries
+library(tidyverse)
+library(lubridate)
+library(gt)
+```
+
+<div align="center"> 
+
+![](sp-logo.png){width=25%}
+
+# NON-GYN Cytology Volumes by Signout Location
+
+## Cytology Quality Assurance
+
+## `r params$year`
+
+```{r import-clean-data, echo=FALSE, message=FALSE}
+# Import raw data
+data_raw <- readxl::read_excel("../data/ngyn_raw.xls",
+                               skip = 1)
+
+# Remove total row & rename first column and extract sequence groups
+data_raw <- data_raw[1:(nrow(data_raw) - 1), ] %>% 
+  rename(seq_group = `...1`) %>% 
+  mutate(
+    seq_group = str_match(
+      seq_group, "(?<=\\().+?(?=\\))"
+    )
+  )
+
+# Pivot data to long form and extract month and year into new columns
+data_long <- 
+  data_raw %>% 
+  pivot_longer(
+    !seq_group,
+    names_to = "Date",
+    values_to = "cases",
+    values_drop_na = TRUE
+  ) %>% 
+  mutate(
+    Date = mdy(Date),
+    yr = year(Date),
+    mth = month(Date, label = TRUE, abbr = TRUE),
+    location = case_when(
+      seq_group == "CPMC" ~ "Summit Pathology Laboratories",
+      seq_group == "EPMC" ~ "Summit Pathology Laboratories",
+      seq_group == "HC" ~ "Summit Pathology Laboratories",
+      seq_group == "OCH" ~ "Summit Pathology Laboratories",
+      seq_group == "SP" ~ "Summit Pathology Laboratories",
+      seq_group == "SRMC" ~ "Summit Pathology Laboratories",
+      seq_group == "BFCMC" ~ "North Colorado Medical Center",
+      seq_group == "EMCH" ~ "North Colorado Medical Center",
+      seq_group == "NCMC" ~ "North Colorado Medical Center",
+      seq_group == "McKee" ~ "McKee Medical Center",
+      seq_group == "MCR" ~ "Medical Center of the Rockies",
+      seq_group == "PVH" ~ "Poudre Valley Hospital",
+      seq_group == "UCHGH" ~ "UCHealth Greeley Hospital",
+      seq_group == "IMH" ~ "Ivinson Memorial Hospital",
+      seq_group == "PCMH" ~ "Summit Pathology Cheyenne",
+      seq_group == "CRMC" ~ "Summit Pathology Cheyenne",
+      seq_group == "MHCC DC" ~ "Summit Pathology Cheyenne",
+      seq_group == "KHS" ~ "Summit Pathology Cheyenne",
+      seq_group == "SPWY" ~ "Summit Pathology Cheyenne",
+      seq_group == "RAWLINS" ~ "Summit Pathology Cheyenne",
+      seq_group == "TORRINGTON" ~ "Summit Pathology Cheyenne",
+      seq_group == "WY VA" ~ "Summit Pathology Cheyenne",
+      seq_group == "PEAK" ~ "Memorial Hospital North",
+      TRUE ~ "-"
+    )
+  ) %>% 
+  filter(location != "-") %>% 
+  group_by(location) %>% 
+  ungroup()
+
+# Pivot data to wide format for summarizing in tables
+data_wide <- 
+  data_long %>% 
+  group_by(yr, mth, location, seq_group) %>% 
+  summarize(n = sum(cases)) %>% 
+  pivot_wider(
+    names_from = mth, values_from = n
+  ) %>% 
+  rowwise() %>% 
+  mutate(
+    Total = sum(c_across(Jan:Dec))
+  ) %>% 
+  ungroup()
+```
+
+```{r spl, echo=FALSE, message=FALSE}
+data_wide %>%
+  filter(yr == params$year &
+           location == "Summit Pathology Laboratories") %>%
+  select(-yr,-location) %>%
+  gt(rowname_col = "seq_group") %>%
+  tab_header(
+    title = md("**Summit Pathology Laboratories**"),
+    subtitle = md("5802 Wright Drive <br>Loveland, CO 80538")
+  ) %>%
+  summary_rows(
+    groups = NULL,
+    columns = vars(Total),
+    fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
+    formatter = fmt_number,
+    decimals = 0,
+  ) %>%
+  tab_stubhead(label = "Facility") %>%
+  tab_options(
+    heading.title.font.size = pct(120),
+    heading.subtitle.font.size = pct(120),
+    table.width = pct(100)
+  )
+
+```
+
+<br><br><br>
+
+```{r ncmc, echo=FALSE, message=FALSE}
+data_wide %>%
+  filter(yr == params$year &
+           location == "North Colorado Medical Center") %>%
+  select(-yr,-location) %>%
+  gt(rowname_col = "seq_group") %>%
+  tab_header(
+    title = md("**North Colorado Medical Center**"),
+    subtitle = md("1801 16th Street <br>Greeley, CO 80631")
+  ) %>%
+  summary_rows(
+    groups = NULL,
+    columns = vars(Total),
+    fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
+    formatter = fmt_number,
+    decimals = 0,
+  ) %>%
+  tab_stubhead(label = "Facility") %>%
+  tab_options(
+    heading.title.font.size = pct(120),
+    heading.subtitle.font.size = pct(120),
+    table.width = pct(100)
+  )
+
+```
+
+<br><br><br>
+
+```{r mckee, echo=FALSE, message=FALSE}
+data_wide %>%
+  filter(yr == params$year &
+           location == "McKee Medical Center") %>%
+  select(-yr,-location) %>%
+  gt(rowname_col = "seq_group") %>%
+  tab_header(
+    title = md("**McKee Medical Center**"),
+    subtitle = md("2000 N Boise Avenue <br>Loveland, CO 80538")
+  ) %>%
+  summary_rows(
+    groups = NULL,
+    columns = vars(Total),
+    fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
+    formatter = fmt_number,
+    decimals = 0,
+  ) %>%
+  tab_stubhead(label = "Facility") %>%
+  tab_options(
+    heading.title.font.size = pct(120),
+    heading.subtitle.font.size = pct(120),
+    table.width = pct(100)
+  )
+
+```
+
+<br><br><br>
+
+```{r mcr, echo=FALSE, message=FALSE}
+data_wide %>%
+  filter(yr == params$year &
+           location == "Medical Center of the Rockies") %>%
+  select(-yr,-location) %>%
+  gt(rowname_col = "seq_group") %>%
+  tab_header(
+    title = md("**Medical Center of the Rockies**"),
+    subtitle = md("2500 Rocky Mountain Avenue <br>Loveland, CO 80538")
+  ) %>%
+  summary_rows(
+    groups = NULL,
+    columns = vars(Total),
+    fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
+    formatter = fmt_number,
+    decimals = 0,
+  ) %>%
+  tab_stubhead(label = "Facility") %>%
+  tab_options(
+    heading.title.font.size = pct(120),
+    heading.subtitle.font.size = pct(120),
+    table.width = pct(100)
+  )
+
+```
+
+<br><br><br>
+
+```{r pvh, echo=FALSE, message=FALSE}
+data_wide %>%
+  filter(yr == params$year &
+           location == "Poudre Valley Hospital") %>%
+  select(-yr,-location) %>%
+  gt(rowname_col = "seq_group") %>%
+  tab_header(
+    title = md("**Poudre Valley Hospital**"),
+    subtitle = md("1024 South Lemay Avenue <br>Fort Collins, CO 80524")
+  ) %>%
+  summary_rows(
+    groups = NULL,
+    columns = vars(Total),
+    fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
+    formatter = fmt_number,
+    decimals = 0,
+  ) %>%
+  tab_stubhead(label = "Facility") %>%
+  tab_options(
+    heading.title.font.size = pct(120),
+    heading.subtitle.font.size = pct(120),
+    table.width = pct(100)
+  )
+
+```
+
+<br><br><br>
+
+```{r uchgh, echo=FALSE, message=FALSE}
+data_wide %>%
+  filter(yr == params$year &
+           location == "UCHealth Greeley Hospital") %>%
+  select(-yr,-location) %>%
+  gt(rowname_col = "seq_group") %>%
+  tab_header(
+    title = md("**UCHealth Greeley Hospital**"),
+    subtitle = md("6767 W 29th Street <br>Greeley, CO 80634")
+  ) %>%
+  summary_rows(
+    groups = NULL,
+    columns = vars(Total),
+    fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
+    formatter = fmt_number,
+    decimals = 0,
+  ) %>%
+  tab_stubhead(label = "Facility") %>%
+  tab_options(
+    heading.title.font.size = pct(120),
+    heading.subtitle.font.size = pct(120),
+    table.width = pct(100)
+  )
+
+```
+
+<div style = "page-break-before: always">
+
+```{r imh, echo=FALSE, message=FALSE}
+data_wide %>%
+  filter(yr == params$year &
+           location == "Ivinson Memorial Hospital") %>%
+  select(-yr,-location) %>%
+  gt(rowname_col = "seq_group") %>%
+  tab_header(
+    title = md("**Ivinson Memorial Hospital**"),
+    subtitle = md("255 N 30th Street <br>Laramie, WY 82072")
+  ) %>%
+  summary_rows(
+    groups = NULL,
+    columns = vars(Total),
+    fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
+    formatter = fmt_number,
+    decimals = 0,
+  ) %>%
+  tab_stubhead(label = "Facility") %>%
+  tab_options(
+    heading.title.font.size = pct(120),
+    heading.subtitle.font.size = pct(120),
+    table.width = pct(100)
+  )
+
+```
+
+<br><br><br>
+
+```{r spwy, echo=FALSE, message=FALSE}
+data_wide %>%
+  filter(yr == params$year &
+           location == "Summit Pathology Cheyenne") %>%
+  select(-yr,-location) %>%
+  gt(rowname_col = "seq_group") %>%
+  tab_header(
+    title = md("**Summit Pathology Cheyenne**"),
+    subtitle = md("2301 House Avenue, Suite 108 <br>Cheyenne, WY 82001")
+  ) %>%
+  summary_rows(
+    groups = NULL,
+    columns = vars(Total),
+    fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
+    formatter = fmt_number,
+    decimals = 0,
+  ) %>%
+  tab_stubhead(label = "Facility") %>%
+  tab_options(
+    heading.title.font.size = pct(120),
+    heading.subtitle.font.size = pct(120),
+    table.width = pct(100)
+  )
+
+```
+
+<br><br><br><br><br>
+<div style = "text-align: left">
+
+Prepared by ___________________________________&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Date ________________
+
+<br><br>
+
+Medical Director ________________________________&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Date ________________
+
+</div>
+</div>
