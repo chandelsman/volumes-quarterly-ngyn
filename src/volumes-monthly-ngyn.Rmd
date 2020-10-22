@@ -11,6 +11,8 @@ params:
     max: 2099
     step: 1
     sep: ""
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -84,10 +86,50 @@ data_long <-
       seq_group == "WY VA" ~ "Summit Pathology Cheyenne",
       seq_group == "PEAK" ~ "Memorial Hospital North",
       TRUE ~ "-"
+    ),
+    # add result ID prefixes to sequence group
+    seq_group = case_when(
+      seq_group == "CPMC" ~ "CPMC (CC)",
+      seq_group == "EPMC" ~ "EPMC (EPC)",
+      seq_group == "HC" ~ "HC (HC)",
+      seq_group == "OCH" ~ "OCH (LC)",
+      seq_group == "SP" ~ "SP (OC)",
+      seq_group == "SRMC" ~ "SRMC (SC)",
+      seq_group == "BFCMC" ~ "BFCMC (BFCC)",
+      seq_group == "EMCH" ~ "EMCH (EC)",
+      seq_group == "NCMC" ~ "NCMC (NC)",
+      seq_group == "McKee" ~ "McKee (MC)",
+      seq_group == "MCR" ~ "MCR (RC)",
+      seq_group == "PVH" ~ "PVH (VC)",
+      seq_group == "UCHGH" ~ "UCHGH (AC)",
+      seq_group == "IMH" ~ "IMH (IC)",
+      seq_group == "PCMH" ~ "PCMH (BPC)",
+      seq_group == "CRMC" ~ "CRMC (CRC)",
+      seq_group == "MHCC DC" ~ "MHCC DC (DC)",
+      seq_group == "KHS" ~ "KHS (KNC)",
+      seq_group == "SPWY" ~ "SPWY (OCW)",
+      seq_group == "RAWLINS" ~ "RAWLINS (RWC)",
+      seq_group == "TORRINGTON" ~ "TORRINGTON (TCC)",
+      seq_group == "WY VA" ~ "WY VA (VAC)",
+      seq_group == "PEAK" ~ "PEAK (PGC)",
+      TRUE ~ "-"
     )
   ) %>% 
   filter(location != "-") %>% 
   group_by(location) %>% 
+  ungroup()
+# Pivot data to wide format and summarize cumulative totals for all facilities
+data_wide_all <- 
+  data_long %>% 
+  group_by(yr, mth) %>% 
+  summarize(n = sum(cases)) %>% 
+  pivot_wider(
+    names_from = mth, values_from = n
+  ) %>% 
+  rowwise() %>% 
+  mutate(
+    Total = sum(c_across(Jan:Dec))
+  ) %>% 
   ungroup()
 
 # Pivot data to wide format for summarizing in tables
@@ -104,6 +146,26 @@ data_wide <-
   ) %>% 
   ungroup()
 ```
+
+<br><br>
+
+```{r all, echo=FALSE, message=FALSE}
+data_wide_all %>%
+  filter(yr == params$year) %>%
+  select(-yr) %>%
+  gt() %>%
+  tab_header(
+    title = md("**Volume Across All Facilities**"),
+  ) %>%
+  tab_options(
+    heading.title.font.size = pct(120),
+    heading.subtitle.font.size = pct(120),
+    table.width = pct(100)
+  )
+
+```
+
+<br><br>
 
 ```{r spl, echo=FALSE, message=FALSE}
 data_wide %>%
@@ -122,7 +184,7 @@ data_wide %>%
     formatter = fmt_number,
     decimals = 0,
   ) %>%
-  tab_stubhead(label = "Facility") %>%
+  tab_stubhead(label = "Facility (Result ID prefix)") %>%
   tab_options(
     heading.title.font.size = pct(120),
     heading.subtitle.font.size = pct(120),
@@ -131,7 +193,7 @@ data_wide %>%
 
 ```
 
-<br><br><br>
+<br><br>
 
 ```{r ncmc, echo=FALSE, message=FALSE}
 data_wide %>%
@@ -150,7 +212,7 @@ data_wide %>%
     formatter = fmt_number,
     decimals = 0,
   ) %>%
-  tab_stubhead(label = "Facility") %>%
+  tab_stubhead(label = "Facility (Result ID prefix)") %>%
   tab_options(
     heading.title.font.size = pct(120),
     heading.subtitle.font.size = pct(120),
@@ -159,7 +221,7 @@ data_wide %>%
 
 ```
 
-<br><br><br>
+<div style = "page-break-before: always">
 
 ```{r mckee, echo=FALSE, message=FALSE}
 data_wide %>%
@@ -178,7 +240,7 @@ data_wide %>%
     formatter = fmt_number,
     decimals = 0,
   ) %>%
-  tab_stubhead(label = "Facility") %>%
+  tab_stubhead(label = "Facility (Result ID prefix)") %>%
   tab_options(
     heading.title.font.size = pct(120),
     heading.subtitle.font.size = pct(120),
@@ -206,7 +268,7 @@ data_wide %>%
     formatter = fmt_number,
     decimals = 0,
   ) %>%
-  tab_stubhead(label = "Facility") %>%
+  tab_stubhead(label = "Facility (Result ID prefix)") %>%
   tab_options(
     heading.title.font.size = pct(120),
     heading.subtitle.font.size = pct(120),
@@ -234,7 +296,7 @@ data_wide %>%
     formatter = fmt_number,
     decimals = 0,
   ) %>%
-  tab_stubhead(label = "Facility") %>%
+  tab_stubhead(label = "Facility (Result ID prefix)") %>%
   tab_options(
     heading.title.font.size = pct(120),
     heading.subtitle.font.size = pct(120),
@@ -262,7 +324,7 @@ data_wide %>%
     formatter = fmt_number,
     decimals = 0,
   ) %>%
-  tab_stubhead(label = "Facility") %>%
+  tab_stubhead(label = "Facility (Result ID prefix)") %>%
   tab_options(
     heading.title.font.size = pct(120),
     heading.subtitle.font.size = pct(120),
@@ -290,7 +352,7 @@ data_wide %>%
     formatter = fmt_number,
     decimals = 0,
   ) %>%
-  tab_stubhead(label = "Facility") %>%
+  tab_stubhead(label = "Facility (Result ID prefix)") %>%
   tab_options(
     heading.title.font.size = pct(120),
     heading.subtitle.font.size = pct(120),
@@ -318,7 +380,7 @@ data_wide %>%
     formatter = fmt_number,
     decimals = 0,
   ) %>%
-  tab_stubhead(label = "Facility") %>%
+  tab_stubhead(label = "Facility (Result ID prefix)") %>%
   tab_options(
     heading.title.font.size = pct(120),
     heading.subtitle.font.size = pct(120),
