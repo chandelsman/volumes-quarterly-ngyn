@@ -32,7 +32,7 @@ library(gt)
 
 ## Cytology Quality Assurance
 
-## `r params$year`
+## `r params$year` Quarters 1--3
 
 ```{r import-clean-data, echo=FALSE, message=FALSE}
 # Import raw data
@@ -113,11 +113,16 @@ data_long <-
       seq_group == "WY VA" ~ "WY VA (VAC)",
       seq_group == "PEAK" ~ "PEAK (PGC)",
       TRUE ~ "-"
-    )
+    )#,
+    # cases = case_when(
+    #   mth == "Oct" ~ 0,
+    #   TRUE ~ cases
+    # )
   ) %>% 
   filter(location != "-") %>% 
   group_by(location) %>% 
   ungroup()
+
 # Pivot data to wide format and summarize cumulative totals for all facilities
 data_wide_all <- 
   data_long %>% 
@@ -125,7 +130,7 @@ data_wide_all <-
   summarize(n = sum(cases)) %>% 
   pivot_wider(
     names_from = mth, values_from = n
-  ) %>% 
+  ) %>%
   rowwise() %>% 
   mutate(
     Total = sum(c_across(Jan:Dec))
