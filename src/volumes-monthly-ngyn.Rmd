@@ -11,6 +11,20 @@ params:
     max: 2099
     step: 1
     sep: ""
+  quarter:
+    label: Reporting Quarter label
+    value: Quarter
+    choices: [Quarter, Quarters]
+  dt_start:
+    label: "Start Date"
+    input: date
+    value: !r Sys.Date()-90
+    max: !r Sys.Date()
+  dt_end: 
+    label: "End Date"
+    input: date
+    value: !r Sys.Date()-1
+    max: !r Sys.Date()
 editor_options: 
   chunk_output_type: console
 ---
@@ -33,7 +47,7 @@ library(gt)
 
 ## Cytology Quality Assurance
 
-## `r params$year` Quarters 1--3
+## `r params$year` `r params$quarter` `r lubridate::quarter(params$dt_start)`--`r lubridate::quarter(params$dt_end)`
 
 ```{r import-clean-data, echo=FALSE, message=FALSE}
 # Import raw data
