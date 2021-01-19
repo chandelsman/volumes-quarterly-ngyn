@@ -21,6 +21,7 @@ knitr::opts_chunk$set(echo = FALSE)
 # load libraries
 library(tidyverse)
 library(lubridate)
+library(here)
 library(gt)
 ```
 
@@ -36,8 +37,7 @@ library(gt)
 
 ```{r import-clean-data, echo=FALSE, message=FALSE}
 # Import raw data
-data_raw <- readxl::read_excel("../data/ngyn_raw.xls",
-                               skip = 1)
+data_raw <- readxl::read_excel(here("data", "2020-volumes-ngyn.xls"), skip = 1)
 
 # Remove total row & rename first column and extract sequence groups
 data_raw <- data_raw[1:(nrow(data_raw) - 1), ] %>% 
