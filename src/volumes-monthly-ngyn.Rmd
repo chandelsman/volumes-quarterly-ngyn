@@ -411,11 +411,15 @@ data_wide %>%
 <br><br><br><br><br>
 <div style = "text-align: left">
 
-Prepared by ___________________________________&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Date ________________
+**Prepared by:** <u> &nbsp; Corey Handelsman &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</u> [**Date:** <u>`r format(as.Date(Sys.Date()), "%m/%d/%Y")` &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;]{style="float:right"}</u>
 
 <br><br>
 
-Medical Director ________________________________&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Date ________________
+**Cytology Director :**________________________________ [**Date:** ________________]{style="float:right"}
+
+<br><br>
+
+**Medical Director :**_________________________________ [**Date:** ________________]{style="float:right"}
 
 </div>
 </div>
