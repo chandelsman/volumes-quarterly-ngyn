@@ -3,27 +3,15 @@ title: ''
 output: 
   html_document
 params:
-  year:
-    input: slider
-    label: "Year"
-    value: 2020
-    min: 2019
-    max: 2099
-    step: 1
-    sep: ""
-  quarter:
-    label: Reporting Quarter label
-    value: Quarter
-    choices: [Quarter, Quarters]
   dt_start:
     label: "Start Date"
     input: date
-    value: !r Sys.Date()-90
+    value: !r Sys.Date()-30
     max: !r Sys.Date()
   dt_end: 
     label: "End Date"
     input: date
-    value: !r Sys.Date()-1
+    value: !r Sys.Date()
     max: !r Sys.Date()
   author:
     label: "Prepared by"
@@ -50,11 +38,15 @@ library(gt)
 
 ## Cytology Quality Assurance
 
-## `r params$year` `r params$quarter` `r lubridate::quarter(params$dt_start)`--`r lubridate::quarter(params$dt_end)`
+## `r params$dt_start`--`r params$dt_end`
 
 ```{r import-clean-data, echo=FALSE, message=FALSE}
 # Import raw data
-data_raw <- readxl::read_excel(here("data", "2020-volumes-ngyn.xls"), skip = 1)
+data_raw <- readxl::read_excel(here("data", "2021-volumes-ngyn.xls"), skip = 1)
+
+# data_raw <- readxl::read_excel(here("data", 
+                                    # paste0(year(params$dt_start), 
+                                    #        "-volumes-ngyn.xls")))
 
 # Remove total row & rename first column and extract sequence groups
 data_raw <- data_raw[1:(nrow(data_raw) - 1), ] %>% 
@@ -173,7 +165,7 @@ data_wide <-
 
 ```{r all, echo=FALSE, message=FALSE}
 data_wide_all %>%
-  filter(yr == params$year) %>%
+  filter(yr == year(params$dt_start)) %>%
   select(-yr) %>%
   gt() %>%
   tab_header(
@@ -191,7 +183,7 @@ data_wide_all %>%
 
 ```{r spl, echo=FALSE, message=FALSE}
 data_wide %>%
-  filter(yr == params$year &
+  filter(yr == year(params$dt_start) &
            location == "Summit Pathology Laboratories") %>%
   select(-yr,-location) %>%
   gt(rowname_col = "seq_group") %>%
@@ -219,7 +211,7 @@ data_wide %>%
 
 ```{r ncmc, echo=FALSE, message=FALSE}
 data_wide %>%
-  filter(yr == params$year &
+  filter(yr == year(params$dt_start) &
            location == "North Colorado Medical Center") %>%
   select(-yr,-location) %>%
   gt(rowname_col = "seq_group") %>%
@@ -247,7 +239,7 @@ data_wide %>%
 
 ```{r mckee, echo=FALSE, message=FALSE}
 data_wide %>%
-  filter(yr == params$year &
+  filter(yr == year(params$dt_start) &
            location == "McKee Medical Center") %>%
   select(-yr,-location) %>%
   gt(rowname_col = "seq_group") %>%
@@ -275,7 +267,7 @@ data_wide %>%
 
 ```{r mcr, echo=FALSE, message=FALSE}
 data_wide %>%
-  filter(yr == params$year &
+  filter(yr == year(params$dt_start) &
            location == "Medical Center of the Rockies") %>%
   select(-yr,-location) %>%
   gt(rowname_col = "seq_group") %>%
@@ -303,7 +295,7 @@ data_wide %>%
 
 ```{r pvh, echo=FALSE, message=FALSE}
 data_wide %>%
-  filter(yr == params$year &
+  filter(yr == year(params$dt_start) &
            location == "Poudre Valley Hospital") %>%
   select(-yr,-location) %>%
   gt(rowname_col = "seq_group") %>%
@@ -331,7 +323,7 @@ data_wide %>%
 
 ```{r uchgh, echo=FALSE, message=FALSE}
 data_wide %>%
-  filter(yr == params$year &
+  filter(yr == year(params$dt_start) &
            location == "UCHealth Greeley Hospital") %>%
   select(-yr,-location) %>%
   gt(rowname_col = "seq_group") %>%
@@ -359,7 +351,7 @@ data_wide %>%
 
 ```{r imh, echo=FALSE, message=FALSE}
 data_wide %>%
-  filter(yr == params$year &
+  filter(yr == year(params$dt_start) &
            location == "Ivinson Memorial Hospital") %>%
   select(-yr,-location) %>%
   gt(rowname_col = "seq_group") %>%
@@ -387,7 +379,7 @@ data_wide %>%
 
 ```{r spwy, echo=FALSE, message=FALSE}
 data_wide %>%
-  filter(yr == params$year &
+  filter(yr == year(params$dt_start) &
            location == "Summit Pathology Cheyenne") %>%
   select(-yr,-location) %>%
   gt(rowname_col = "seq_group") %>%
