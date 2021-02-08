@@ -42,11 +42,12 @@ library(gt)
 
 ```{r import-clean-data, echo=FALSE, message=FALSE}
 # Import raw data
-data_raw <- readxl::read_excel(here("data", "2021-volumes-ngyn.xls"), skip = 1)
-
-# data_raw <- readxl::read_excel(here("data", 
-                                    # paste0(year(params$dt_start), 
-                                    #        "-volumes-ngyn.xls")))
+data_raw <- 
+  list.files(path = here("data"), 
+                       pattern = "\\d{4}-volumes-ngyn\\.xls",
+                       full.names = TRUE) %>% 
+  sapply(readxl::read_excel, skip = 1, simplify = FALSE) %>% 
+  bind_rows()
 
 # Remove total row & rename first column and extract sequence groups
 data_raw <- data_raw[1:(nrow(data_raw) - 1), ] %>% 
