@@ -6,12 +6,12 @@ params:
   dt_start:
     label: "Start Date"
     input: date
-    value: !r Sys.Date()-30
+    value: !r Sys.Date() - 30
     max: !r Sys.Date()
   dt_end: 
     label: "End Date"
     input: date
-    value: !r Sys.Date()
+    value: !r Sys.Date() - 1
     max: !r Sys.Date()
   author:
     label: "Prepared by"
@@ -208,7 +208,8 @@ data_wide %>%
 
 ```
 
-<br><br>
+<!-- <br><br> -->
+<div style = "page-break-before: always">
 
 ```{r ncmc, echo=FALSE, message=FALSE}
 data_wide %>%
@@ -235,8 +236,8 @@ data_wide %>%
   )
 
 ```
-
-<div style = "page-break-before: always">
+<br><br>
+<!-- <div style = "page-break-before: always"> -->
 
 ```{r mckee, echo=FALSE, message=FALSE}
 data_wide %>%
@@ -292,7 +293,7 @@ data_wide %>%
 
 ```
 
-<br><br><br>
+<div style = "page-break-before: always">
 
 ```{r pvh, echo=FALSE, message=FALSE}
 data_wide %>%
@@ -348,7 +349,7 @@ data_wide %>%
 
 ```
 
-<div style = "page-break-before: always">
+<br><br>
 
 ```{r imh, echo=FALSE, message=FALSE}
 data_wide %>%
@@ -376,7 +377,7 @@ data_wide %>%
 
 ```
 
-<br><br><br>
+<div style = "page-break-before: always">
 
 ```{r spwy, echo=FALSE, message=FALSE}
 data_wide %>%
@@ -404,18 +405,18 @@ data_wide %>%
 
 ```
 
-<br><br><br><br><br>
+<br><br><br>
 <div style = "text-align: left">
-
-*Prepared by `r params$author` on `r format(as.Date(Sys.Date()), "%m/%d/%Y")`*
-
-<br><br>
 
 **Cytology Director :**________________________________ [**Date:** ________________]{style="float:right"}
 
 <br><br>
 
 **Medical Director :**_________________________________ [**Date:** ________________]{style="float:right"}
+
+<br><br>
+
+*Prepared by `r params$author` on `r format(as.Date(Sys.Date()), "%m/%d/%Y")`*
 
 </div>
 </div>
