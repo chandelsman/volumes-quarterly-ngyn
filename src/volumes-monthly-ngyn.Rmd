@@ -71,6 +71,10 @@ data_long <-
     Date = mdy(Date),
     yr = year(Date),
     mth = month(Date, label = TRUE, abbr = TRUE),
+    cases = case_when(
+      Date >= floor_date(ymd(Sys.Date()), "month") ~ 0, 
+      TRUE ~ cases
+    ),
     location = case_when(
       seq_group == "CPMC" ~ "Summit Pathology Laboratories",
       seq_group == "EPMC" ~ "Summit Pathology Laboratories",
@@ -123,11 +127,7 @@ data_long <-
       seq_group == "WY VA" ~ "WY VA (VAC)",
       seq_group == "PEAK" ~ "PEAK (PGC)",
       TRUE ~ "-"
-    )#,
-    # cases = case_when(
-    #   mth == "Oct" ~ 0,
-    #   TRUE ~ cases
-    # )
+    )
   ) %>% 
   filter(location != "-") %>% 
   group_by(location) %>% 
@@ -236,7 +236,7 @@ data_wide %>%
   )
 
 ```
-<br><br>
+<br><br><br>
 <!-- <div style = "page-break-before: always"> -->
 
 ```{r mckee, echo=FALSE, message=FALSE}
@@ -349,7 +349,7 @@ data_wide %>%
 
 ```
 
-<br><br>
+<br><br><br>
 
 ```{r imh, echo=FALSE, message=FALSE}
 data_wide %>%
@@ -405,7 +405,7 @@ data_wide %>%
 
 ```
 
-<br><br><br>
+<br><br><br><br><br>
 <div style = "text-align: left">
 
 **Cytology Director :**________________________________ [**Date:** ________________]{style="float:right"}
@@ -414,7 +414,7 @@ data_wide %>%
 
 **Medical Director :**_________________________________ [**Date:** ________________]{style="float:right"}
 
-<br><br>
+<br>
 
 *Prepared by `r params$author` on `r format(as.Date(Sys.Date()), "%m/%d/%Y")`*
 
