@@ -42,39 +42,33 @@ library(gt)
 
 ```{r import-clean-data, echo=FALSE, message=FALSE}
 # Import raw data
-data_raw <- 
-  list.files(path = here("data"), 
-                       pattern = "\\d{4}-volumes-ngyn\\.xls",
-                       full.names = TRUE) %>% 
-  sapply(readxl::read_excel, skip = 1, simplify = FALSE) %>% 
+data_raw <-
+  list.files(path = here("data"),
+             pattern = "\\d{4}-volumes-ngyn\\.xls",
+             full.names = TRUE) %>%
+  sapply(readxl::read_excel, skip = 1, simplify = FALSE) %>%
   bind_rows()
 
 # Remove total row & rename first column and extract sequence groups
-data_raw <- data_raw[1:(nrow(data_raw) - 1), ] %>% 
-  rename(seq_group = `...1`) %>% 
-  mutate(
-    seq_group = str_match(
-      seq_group, "(?<=\\().+?(?=\\))"
-    )
-  )
+data_raw <- data_raw[1:(nrow(data_raw) - 1),] %>%
+  rename(seq_group = `...1`) %>%
+  mutate(seq_group = str_match(seq_group, "(?<=\\().+?(?=\\))"))
 
 # Pivot data to long form and extract month and year into new columns
-data_long <- 
-  data_raw %>% 
+data_long <-
+  data_raw %>%
   pivot_longer(
     !seq_group,
     names_to = "Date",
     values_to = "cases",
     values_drop_na = TRUE
-  ) %>% 
+  ) %>%
   mutate(
     Date = mdy(Date),
     yr = year(Date),
     mth = month(Date, label = TRUE, abbr = TRUE),
     cases = case_when(
-      Date >= floor_date(ymd(Sys.Date()), "month") ~ 0, 
-      TRUE ~ cases
-    ),
+      Date >= floor_date(ymd(Sys.Date()), "month") ~ 0, TRUE ~ cases), 
     location = case_when(
       seq_group == "CPMC" ~ "Summit Pathology Laboratories",
       seq_group == "EPMC" ~ "Summit Pathology Laboratories",
@@ -128,37 +122,29 @@ data_long <-
       seq_group == "PEAK" ~ "PEAK (PGC)",
       TRUE ~ "-"
     )
-  ) %>% 
-  filter(location != "-") %>% 
-  group_by(location) %>% 
+  ) %>%
+  filter(location != "-") %>%
+  group_by(location) %>%
   ungroup()
 
 # Pivot data to wide format and summarize cumulative totals for all facilities
-data_wide_all <- 
-  data_long %>% 
-  group_by(yr, mth) %>% 
-  summarize(n = sum(cases, na.rm = TRUE)) %>% 
-  pivot_wider(
-    names_from = mth, values_from = n
-  ) %>%
-  rowwise() %>% 
-  mutate(
-    Total = sum(c_across(Jan:Dec), na.rm = TRUE)
-  ) %>% 
+data_wide_all <-
+  data_long %>%
+  group_by(yr, mth) %>%
+  summarize(n = sum(cases, na.rm = TRUE)) %>%
+  pivot_wider(names_from = mth, values_from = n) %>%
+  rowwise() %>%
+  mutate(Total = sum(c_across(Jan:Dec), na.rm = TRUE)) %>%
   ungroup()
 
 # Pivot data to wide format for summarizing in tables
-data_wide <- 
-  data_long %>% 
-  group_by(yr, mth, location, seq_group) %>% 
-  summarize(n = sum(cases)) %>% 
-  pivot_wider(
-    names_from = mth, values_from = n
-  ) %>% 
-  rowwise() %>% 
-  mutate(
-    Total = sum(c_across(Jan:Dec), na.rm = TRUE)
-  ) %>% 
+data_wide <-
+  data_long %>%
+  group_by(yr, mth, location, seq_group) %>%
+  summarize(n = sum(cases)) %>%
+  pivot_wider(names_from = mth, values_from = n) %>%
+  rowwise() %>%
+  mutate(Total = sum(c_across(Jan:Dec), na.rm = TRUE)) %>%
   ungroup()
 ```
 
@@ -169,9 +155,7 @@ data_wide_all %>%
   filter(yr == year(params$dt_start)) %>%
   select(-yr) %>%
   gt() %>%
-  tab_header(
-    title = md("**Volume Across All Facilities**"),
-  ) %>%
+  tab_header(title = md("**Volume Across All Facilities**")) %>%
   tab_options(
     heading.title.font.size = pct(120),
     heading.subtitle.font.size = pct(120),
@@ -215,7 +199,7 @@ data_wide %>%
 data_wide %>%
   filter(yr == year(params$dt_start) &
            location == "North Colorado Medical Center") %>%
-  select(-yr,-location) %>%
+  select(-yr, -location) %>%
   gt(rowname_col = "seq_group") %>%
   tab_header(
     title = md("**North Colorado Medical Center**"),
@@ -243,7 +227,7 @@ data_wide %>%
 data_wide %>%
   filter(yr == year(params$dt_start) &
            location == "McKee Medical Center") %>%
-  select(-yr,-location) %>%
+  select(-yr, -location) %>%
   gt(rowname_col = "seq_group") %>%
   tab_header(
     title = md("**McKee Medical Center**"),
@@ -271,7 +255,7 @@ data_wide %>%
 data_wide %>%
   filter(yr == year(params$dt_start) &
            location == "Medical Center of the Rockies") %>%
-  select(-yr,-location) %>%
+  select(-yr, -location) %>%
   gt(rowname_col = "seq_group") %>%
   tab_header(
     title = md("**Medical Center of the Rockies**"),
@@ -299,7 +283,7 @@ data_wide %>%
 data_wide %>%
   filter(yr == year(params$dt_start) &
            location == "Poudre Valley Hospital") %>%
-  select(-yr,-location) %>%
+  select(-yr, -location) %>%
   gt(rowname_col = "seq_group") %>%
   tab_header(
     title = md("**Poudre Valley Hospital**"),
@@ -327,7 +311,7 @@ data_wide %>%
 data_wide %>%
   filter(yr == year(params$dt_start) &
            location == "UCHealth Greeley Hospital") %>%
-  select(-yr,-location) %>%
+  select(-yr, -location) %>%
   gt(rowname_col = "seq_group") %>%
   tab_header(
     title = md("**UCHealth Greeley Hospital**"),
@@ -355,7 +339,7 @@ data_wide %>%
 data_wide %>%
   filter(yr == year(params$dt_start) &
            location == "Ivinson Memorial Hospital") %>%
-  select(-yr,-location) %>%
+  select(-yr, -location) %>%
   gt(rowname_col = "seq_group") %>%
   tab_header(
     title = md("**Ivinson Memorial Hospital**"),
@@ -383,7 +367,7 @@ data_wide %>%
 data_wide %>%
   filter(yr == year(params$dt_start) &
            location == "Summit Pathology Cheyenne") %>%
-  select(-yr,-location) %>%
+  select(-yr, -location) %>%
   gt(rowname_col = "seq_group") %>%
   tab_header(
     title = md("**Summit Pathology Cheyenne**"),
