@@ -137,13 +137,13 @@ data_long <-
 data_wide_all <- 
   data_long %>% 
   group_by(yr, mth) %>% 
-  summarize(n = sum(cases)) %>% 
+  summarize(n = sum(cases, na.rm = TRUE)) %>% 
   pivot_wider(
     names_from = mth, values_from = n
   ) %>%
   rowwise() %>% 
   mutate(
-    Total = sum(c_across(Jan:Dec))
+    Total = sum(c_across(Jan:Dec), na.rm = TRUE)
   ) %>% 
   ungroup()
 
@@ -157,7 +157,7 @@ data_wide <-
   ) %>% 
   rowwise() %>% 
   mutate(
-    Total = sum(c_across(Jan:Dec))
+    Total = sum(c_across(Jan:Dec), na.rm = TRUE)
   ) %>% 
   ungroup()
 ```
