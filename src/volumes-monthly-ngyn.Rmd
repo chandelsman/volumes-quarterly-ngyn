@@ -6,12 +6,12 @@ params:
   dt_start:
     label: "Start Date"
     input: date
-    value: !r Sys.Date() - 30
+    value: !r lubridate::floor_date(Sys.Date(), "year")
     max: !r Sys.Date()
   dt_end: 
     label: "End Date"
     input: date
-    value: !r Sys.Date() - 1
+    value: !r lubridate::floor_date(Sys.Date(), "quarter") - 1
     max: !r Sys.Date()
   author:
     label: "Prepared by"
