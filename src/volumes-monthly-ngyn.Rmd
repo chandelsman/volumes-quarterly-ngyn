@@ -150,7 +150,7 @@ data_wide <-
 
 <br><br>
 
-```{r all, echo=FALSE, message=FALSE}
+```{r all-facilities, echo=FALSE, message=FALSE}
 data_wide_all %>%
   filter(yr == year(params$dt_start)) %>%
   select(-yr) %>%
@@ -192,8 +192,7 @@ data_wide %>%
 
 ```
 
-<!-- <br><br> -->
-<div style = "page-break-before: always">
+<br><br>
 
 ```{r ncmc, echo=FALSE, message=FALSE}
 data_wide %>%
@@ -220,8 +219,8 @@ data_wide %>%
   )
 
 ```
-<br><br><br>
-<!-- <div style = "page-break-before: always"> -->
+
+<div style = "page-break-before: always">
 
 ```{r mckee, echo=FALSE, message=FALSE}
 data_wide %>%
@@ -249,7 +248,7 @@ data_wide %>%
 
 ```
 
-<br><br><br>
+<br><br>
 
 ```{r mcr, echo=FALSE, message=FALSE}
 data_wide %>%
@@ -277,7 +276,7 @@ data_wide %>%
 
 ```
 
-<div style = "page-break-before: always">
+<br><br>
 
 ```{r pvh, echo=FALSE, message=FALSE}
 data_wide %>%
@@ -305,7 +304,7 @@ data_wide %>%
 
 ```
 
-<br><br><br>
+<br><br>
 
 ```{r uchgh, echo=FALSE, message=FALSE}
 data_wide %>%
@@ -333,7 +332,7 @@ data_wide %>%
 
 ```
 
-<br><br><br>
+<br><br>
 
 ```{r imh, echo=FALSE, message=FALSE}
 data_wide %>%
@@ -389,7 +388,8 @@ data_wide %>%
 
 ```
 
-<br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br>
 <div style = "text-align: left">
 
 **Cytology Director :**________________________________ [**Date:** ________________]{style="float:right"}
