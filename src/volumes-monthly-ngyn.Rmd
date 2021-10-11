@@ -360,7 +360,7 @@ data_wide %>%
 
 ```
 
-<br><br>
+<div style = "page-break-before: always">
 
 ```{r imh, echo=FALSE, message=FALSE}
 data_wide %>%
@@ -391,8 +391,6 @@ data_wide %>%
   )
 
 ```
-
-<div style = "page-break-before: always">
 
 ```{r spwy, echo=FALSE, message=FALSE}
 data_wide %>%
@@ -425,7 +423,6 @@ data_wide %>%
 ```
 
 <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-<br><br><br><br><br><br><br><br><br><br>
 <div style = "text-align: left">
 
 **Cytology Director :**________________________________ [**Date:** ________________]{style="float:right"}
