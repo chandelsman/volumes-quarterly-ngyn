@@ -44,7 +44,7 @@ library(gt)
 # Import raw data
 data_raw <-
   list.files(path = here("data"),
-             pattern = "\\d{4}-volumes-ngyn\\.xls",
+             pattern = "^\\d{4}-volumes-ngyn\\.xls",
              full.names = TRUE) %>%
   sapply(readxl::read_excel, skip = 1, simplify = FALSE) %>%
   bind_rows()
@@ -189,7 +189,7 @@ data_wide %>%
     columns = c(Total),
     fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
     formatter = fmt_number,
-    decimals = 0,
+    decimals = 0
   ) %>%
   tab_stubhead(label = "Facility (Result ID prefix)") %>%
   tab_options(
@@ -221,7 +221,7 @@ data_wide %>%
     columns = c(Total),
     fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
     formatter = fmt_number,
-    decimals = 0,
+    decimals = 0
   ) %>%
   tab_stubhead(label = "Facility (Result ID prefix)") %>%
   tab_options(
@@ -253,7 +253,7 @@ data_wide %>%
     columns = c(Total),
     fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
     formatter = fmt_number,
-    decimals = 0,
+    decimals = 0
   ) %>%
   tab_stubhead(label = "Facility (Result ID prefix)") %>%
   tab_options(
@@ -285,7 +285,7 @@ data_wide %>%
     columns = c(Total),
     fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
     formatter = fmt_number,
-    decimals = 0,
+    decimals = 0
   ) %>%
   tab_stubhead(label = "Facility (Result ID prefix)") %>%
   tab_options(
@@ -317,7 +317,7 @@ data_wide %>%
     columns = c(Total),
     fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
     formatter = fmt_number,
-    decimals = 0,
+    decimals = 0
   ) %>%
   tab_stubhead(label = "Facility (Result ID prefix)") %>%
   tab_options(
@@ -349,7 +349,7 @@ data_wide %>%
     columns = c(Total),
     fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
     formatter = fmt_number,
-    decimals = 0,
+    decimals = 0
   ) %>%
   tab_stubhead(label = "Facility (Result ID prefix)") %>%
   tab_options(
@@ -381,7 +381,7 @@ data_wide %>%
     columns = c(Total),
     fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
     formatter = fmt_number,
-    decimals = 0,
+    decimals = 0
   ) %>%
   tab_stubhead(label = "Facility (Result ID prefix)") %>%
   tab_options(
@@ -411,7 +411,7 @@ data_wide %>%
     columns = c(Total),
     fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
     formatter = fmt_number,
-    decimals = 0,
+    decimals = 0
   ) %>%
   tab_stubhead(label = "Facility (Result ID prefix)") %>%
   tab_options(
