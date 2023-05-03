@@ -98,6 +98,7 @@ data_long <-
       seq_group == "TORRINGTON" ~ "Summit Pathology Cheyenne",
       seq_group == "WY VA" ~ "Summit Pathology Cheyenne",
       seq_group == "PEAK" ~ "Memorial Hospital North",
+      seq_group == "WMC Casper" ~ "Wyoming Medical Center Central",
       TRUE ~ "-"
     ),
     # add result ID prefixes to sequence group
@@ -125,6 +126,7 @@ data_long <-
       seq_group == "TORRINGTON" ~ "TORRINGTON (TCC)",
       seq_group == "WY VA" ~ "WY VA (VAC)",
       seq_group == "PEAK" ~ "PEAK (PGC)",
+      seq_group == "WMC Casper" ~ "Wyoming Medical Center Central",
       TRUE ~ "-"
     )
   ) %>%
@@ -427,7 +429,37 @@ data_wide %>%
 
 ```
 
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+```{r WY-Med-Center, echo=FALSE, message=FALSE}
+data_wide %>%
+  filter(yr == year(params$dt_start) &
+           location == "Wyoming Medical Center Central") %>%
+  select(-yr, -location) %>%
+  gt(rowname_col = "seq_group") %>%
+  tab_header(
+    title = md("**Wyoming Medical Center Central**"),
+    subtitle = md(" 1233 E Second Street, Casper, WY 82601")
+  ) %>%
+    sub_missing(
+    columns = 1:13, 
+    missing_text = "--"
+  ) %>% 
+  summary_rows(
+    groups = NULL,
+    columns = c(Total),
+    fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
+    formatter = fmt_number,
+    decimals = 0
+  ) %>%
+  tab_stubhead(label = "Facility (Result ID prefix)") %>%
+  tab_options(
+    heading.title.font.size = pct(120),
+    heading.subtitle.font.size = pct(120),
+    table.width = pct(100)
+  )
+
+```
+
+<br><br><br><br><br>
 <div style = "text-align: left">
 
 **Cytology Director :**________________________________ [**Date:** ________________]{style="float:right"}
