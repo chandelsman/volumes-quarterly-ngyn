@@ -44,7 +44,7 @@ Query is performed in LigoLab
 
 ### Printing and Saving
 
-- Print to PDF with scaling set to 74% and file named 20XXq#_NGYN-volumes
+- Print to PDF with scaling set to 91% and file named 20XXq#_NGYN-volumes
 
 ## Distribution
 

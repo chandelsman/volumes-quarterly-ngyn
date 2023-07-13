@@ -45,15 +45,15 @@ library(gt)
 data_raw <-
   list.files(path = here("data"),
              pattern = "^\\d{4}-volumes-ngyn\\.xls",
-             full.names = TRUE) %>%
-  sapply(readxl::read_excel, skip = 1, simplify = FALSE) %>%
+             full.names = TRUE) |>
+  sapply(readxl::read_excel, skip = 1, simplify = FALSE) |>
   bind_rows()
 
 # Remove total row & rename first column and extract sequence groups
 data_raw <-
-  data_raw %>%
-  rename(seq_group = `...1`) %>%
-  filter(str_detect(seq_group, "Total", negate = TRUE)) %>%
+  data_raw |>
+  rename(seq_group = `...1`) |>
+  filter(str_detect(seq_group, "Total", negate = TRUE)) |>
   mutate(
     seq_group = str_replace(seq_group, ".*\\(", ""),
     seq_group = str_replace(seq_group, "\\)", "")
@@ -61,13 +61,13 @@ data_raw <-
 
 # Pivot data to long form and extract month and year into new columns
 data_long <-
-  data_raw %>%
+  data_raw |>
   pivot_longer(
     !seq_group,
     names_to = "Date",
     values_to = "cases",
     values_drop_na = TRUE
-  ) %>%
+  ) |>
   mutate(
     Date = mdy(Date),
     yr = year(Date),
@@ -129,44 +129,44 @@ data_long <-
       seq_group == "WMC Casper" ~ "Wyoming Medical Center Central",
       TRUE ~ "-"
     )
-  ) %>%
-  filter(location != "-") %>%
-  group_by(location) %>%
+  ) |>
+  filter(location != "-") |>
+  group_by(location) |>
   ungroup()
 
 # Pivot data to wide format and summarize cumulative totals for all facilities
 data_wide_all <-
-  data_long %>%
-  group_by(yr, mth) %>%
-  summarize(n = sum(cases, na.rm = TRUE)) %>%
-  pivot_wider(names_from = mth, values_from = n) %>%
-  rowwise() %>%
-  mutate(Total = sum(c_across(Jan:Dec), na.rm = TRUE)) %>%
+  data_long |>
+  group_by(yr, mth) |>
+  summarize(n = sum(cases, na.rm = TRUE)) |>
+  pivot_wider(names_from = mth, values_from = n) |>
+  rowwise() |>
+  mutate(Total = sum(c_across(Jan:Dec), na.rm = TRUE)) |>
   ungroup()
 
 # Pivot data to wide format for summarizing in tables
 data_wide <-
-  data_long %>%
-  group_by(yr, mth, location, seq_group) %>%
-  summarize(n = sum(cases)) %>%
-  pivot_wider(names_from = mth, values_from = n) %>%
-  rowwise() %>%
-  mutate(Total = sum(c_across(Jan:Dec), na.rm = TRUE)) %>%
+  data_long |>
+  group_by(yr, mth, location, seq_group) |>
+  summarize(n = sum(cases)) |>
+  pivot_wider(names_from = mth, values_from = n) |>
+  rowwise() |>
+  mutate(Total = sum(c_across(Jan:Dec), na.rm = TRUE)) |>
   ungroup()
 ```
 
 <br><br>
 
 ```{r all-facilities, echo=FALSE, message=FALSE}
-data_wide_all %>%
-  filter(yr == year(params$dt_start)) %>%
-  select(-yr) %>%
-  gt() %>%
-  tab_header(title = md("**Volume Across All Facilities**")) %>%
+data_wide_all |>
+  filter(yr == year(params$dt_start)) |>
+  select(-yr) |>
+  gt() |>
+  tab_header(title = md("**Volume Across All Facilities**")) |>
   sub_missing(
     columns = 1:12, 
     missing_text = "--"
-  ) %>% 
+  ) |> 
   tab_options(
     heading.title.font.size = pct(120),
     heading.subtitle.font.size = pct(120),
@@ -178,27 +178,27 @@ data_wide_all %>%
 <br><br>
 
 ```{r spl, echo=FALSE, message=FALSE}
-data_wide %>%
+data_wide |>
   filter(yr == year(params$dt_start) &
-           location == "Summit Pathology Laboratories") %>%
-  select(-yr,-location) %>%
-  gt(rowname_col = "seq_group") %>%
+           location == "Summit Pathology Laboratories") |>
+  select(-yr,-location) |>
+  gt(rowname_col = "seq_group") |>
   tab_header(
     title = md("**Summit Pathology Laboratories**"),
     subtitle = md("5802 Wright Drive <br>Loveland, CO 80538")
-  ) %>%
+  ) |>
   sub_missing(
     columns = 1:13, 
     missing_text = "--"
-  ) %>% 
+  ) |> 
   summary_rows(
     groups = NULL,
     columns = c(Total),
     fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
     formatter = fmt_number,
     decimals = 0
-  ) %>%
-  tab_stubhead(label = "Facility (Result ID prefix)") %>%
+  ) |>
+  tab_stubhead(label = "Facility (Result ID prefix)") |>
   tab_options(
     heading.title.font.size = pct(120),
     heading.subtitle.font.size = pct(120),
@@ -210,27 +210,27 @@ data_wide %>%
 <br><br>
 
 ```{r ncmc, echo=FALSE, message=FALSE}
-data_wide %>%
+data_wide |>
   filter(yr == year(params$dt_start) &
-           location == "North Colorado Medical Center") %>%
-  select(-yr, -location) %>%
-  gt(rowname_col = "seq_group") %>%
+           location == "North Colorado Medical Center") |>
+  select(-yr, -location) |>
+  gt(rowname_col = "seq_group") |>
   tab_header(
     title = md("**North Colorado Medical Center**"),
     subtitle = md("1801 16th Street <br>Greeley, CO 80631")
-  ) %>%
+  ) |>
     sub_missing(
     columns = 1:13, 
     missing_text = "--"
-  ) %>% 
+  ) |> 
   summary_rows(
     groups = NULL,
     columns = c(Total),
     fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
     formatter = fmt_number,
     decimals = 0
-  ) %>%
-  tab_stubhead(label = "Facility (Result ID prefix)") %>%
+  ) |>
+  tab_stubhead(label = "Facility (Result ID prefix)") |>
   tab_options(
     heading.title.font.size = pct(120),
     heading.subtitle.font.size = pct(120),
@@ -242,27 +242,27 @@ data_wide %>%
 <div style = "page-break-before: always">
 
 ```{r mckee, echo=FALSE, message=FALSE}
-data_wide %>%
+data_wide |>
   filter(yr == year(params$dt_start) &
-           location == "McKee Medical Center") %>%
-  select(-yr, -location) %>%
-  gt(rowname_col = "seq_group") %>%
+           location == "McKee Medical Center") |>
+  select(-yr, -location) |>
+  gt(rowname_col = "seq_group") |>
   tab_header(
     title = md("**McKee Medical Center**"),
     subtitle = md("2000 N Boise Avenue <br>Loveland, CO 80538")
-  ) %>%
+  ) |>
     sub_missing(
     columns = 1:13, 
     missing_text = "--"
-  ) %>% 
+  ) |> 
   summary_rows(
     groups = NULL,
     columns = c(Total),
     fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
     formatter = fmt_number,
     decimals = 0
-  ) %>%
-  tab_stubhead(label = "Facility (Result ID prefix)") %>%
+  ) |>
+  tab_stubhead(label = "Facility (Result ID prefix)") |>
   tab_options(
     heading.title.font.size = pct(120),
     heading.subtitle.font.size = pct(120),
@@ -274,27 +274,27 @@ data_wide %>%
 <br><br>
 
 ```{r mcr, echo=FALSE, message=FALSE}
-data_wide %>%
+data_wide |>
   filter(yr == year(params$dt_start) &
-           location == "Medical Center of the Rockies") %>%
-  select(-yr, -location) %>%
-  gt(rowname_col = "seq_group") %>%
+           location == "Medical Center of the Rockies") |>
+  select(-yr, -location) |>
+  gt(rowname_col = "seq_group") |>
   tab_header(
     title = md("**Medical Center of the Rockies**"),
     subtitle = md("2500 Rocky Mountain Avenue <br>Loveland, CO 80538")
-  ) %>%
+  ) |>
     sub_missing(
     columns = 1:13, 
     missing_text = "--"
-  ) %>% 
+  ) |> 
   summary_rows(
     groups = NULL,
     columns = c(Total),
     fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
     formatter = fmt_number,
     decimals = 0
-  ) %>%
-  tab_stubhead(label = "Facility (Result ID prefix)") %>%
+  ) |>
+  tab_stubhead(label = "Facility (Result ID prefix)") |>
   tab_options(
     heading.title.font.size = pct(120),
     heading.subtitle.font.size = pct(120),
@@ -306,27 +306,27 @@ data_wide %>%
 <br><br>
 
 ```{r pvh, echo=FALSE, message=FALSE}
-data_wide %>%
+data_wide |>
   filter(yr == year(params$dt_start) &
-           location == "Poudre Valley Hospital") %>%
-  select(-yr, -location) %>%
-  gt(rowname_col = "seq_group") %>%
+           location == "Poudre Valley Hospital") |>
+  select(-yr, -location) |>
+  gt(rowname_col = "seq_group") |>
   tab_header(
     title = md("**Poudre Valley Hospital**"),
     subtitle = md("1024 South Lemay Avenue <br>Fort Collins, CO 80524")
-  ) %>%
+  ) |>
     sub_missing(
     columns = 1:13, 
     missing_text = "--"
-  ) %>% 
+  ) |> 
   summary_rows(
     groups = NULL,
     columns = c(Total),
     fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
     formatter = fmt_number,
     decimals = 0
-  ) %>%
-  tab_stubhead(label = "Facility (Result ID prefix)") %>%
+  ) |>
+  tab_stubhead(label = "Facility (Result ID prefix)") |>
   tab_options(
     heading.title.font.size = pct(120),
     heading.subtitle.font.size = pct(120),
@@ -338,27 +338,27 @@ data_wide %>%
 <br><br>
 
 ```{r uchgh, echo=FALSE, message=FALSE}
-data_wide %>%
+data_wide |>
   filter(yr == year(params$dt_start) &
-           location == "UCHealth Greeley Hospital") %>%
-  select(-yr, -location) %>%
-  gt(rowname_col = "seq_group") %>%
+           location == "UCHealth Greeley Hospital") |>
+  select(-yr, -location) |>
+  gt(rowname_col = "seq_group") |>
   tab_header(
     title = md("**UCHealth Greeley Hospital**"),
     subtitle = md("6767 W 29th Street <br>Greeley, CO 80634")
-  ) %>%
+  ) |>
     sub_missing(
     columns = 1:13, 
     missing_text = "--"
-  ) %>% 
+  ) |> 
   summary_rows(
     groups = NULL,
     columns = c(Total),
     fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
     formatter = fmt_number,
     decimals = 0
-  ) %>%
-  tab_stubhead(label = "Facility (Result ID prefix)") %>%
+  ) |>
+  tab_stubhead(label = "Facility (Result ID prefix)") |>
   tab_options(
     heading.title.font.size = pct(120),
     heading.subtitle.font.size = pct(120),
@@ -370,27 +370,27 @@ data_wide %>%
 <div style = "page-break-before: always">
 
 ```{r imh, echo=FALSE, message=FALSE}
-data_wide %>%
+data_wide |>
   filter(yr == year(params$dt_start) &
-           location == "Ivinson Memorial Hospital") %>%
-  select(-yr, -location) %>%
-  gt(rowname_col = "seq_group") %>%
+           location == "Ivinson Memorial Hospital") |>
+  select(-yr, -location) |>
+  gt(rowname_col = "seq_group") |>
   tab_header(
     title = md("**Ivinson Memorial Hospital**"),
     subtitle = md("255 N 30th Street <br>Laramie, WY 82072")
-  ) %>%
+  ) |>
     sub_missing(
     columns = 1:13, 
     missing_text = "--"
-  ) %>% 
+  ) |> 
   summary_rows(
     groups = NULL,
     columns = c(Total),
     fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
     formatter = fmt_number,
     decimals = 0
-  ) %>%
-  tab_stubhead(label = "Facility (Result ID prefix)") %>%
+  ) |>
+  tab_stubhead(label = "Facility (Result ID prefix)") |>
   tab_options(
     heading.title.font.size = pct(120),
     heading.subtitle.font.size = pct(120),
@@ -400,27 +400,27 @@ data_wide %>%
 ```
 
 ```{r spwy, echo=FALSE, message=FALSE}
-data_wide %>%
+data_wide |>
   filter(yr == year(params$dt_start) &
-           location == "Summit Pathology Cheyenne") %>%
-  select(-yr, -location) %>%
-  gt(rowname_col = "seq_group") %>%
+           location == "Summit Pathology Cheyenne") |>
+  select(-yr, -location) |>
+  gt(rowname_col = "seq_group") |>
   tab_header(
     title = md("**Summit Pathology Cheyenne**"),
     subtitle = md("2301 House Avenue, Suite 108 <br>Cheyenne, WY 82001")
-  ) %>%
+  ) |>
     sub_missing(
     columns = 1:13, 
     missing_text = "--"
-  ) %>% 
+  ) |> 
   summary_rows(
     groups = NULL,
     columns = c(Total),
     fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
     formatter = fmt_number,
     decimals = 0
-  ) %>%
-  tab_stubhead(label = "Facility (Result ID prefix)") %>%
+  ) |>
+  tab_stubhead(label = "Facility (Result ID prefix)") |>
   tab_options(
     heading.title.font.size = pct(120),
     heading.subtitle.font.size = pct(120),
@@ -430,27 +430,27 @@ data_wide %>%
 ```
 
 ```{r WY-Med-Center, echo=FALSE, message=FALSE}
-data_wide %>%
+data_wide |>
   filter(yr == year(params$dt_start) &
-           location == "Wyoming Medical Center Central") %>%
-  select(-yr, -location) %>%
-  gt(rowname_col = "seq_group") %>%
+           location == "Wyoming Medical Center Central") |>
+  select(-yr, -location) |>
+  gt(rowname_col = "seq_group") |>
   tab_header(
     title = md("**Wyoming Medical Center Central**"),
     subtitle = md(" 1233 E Second Street, Casper, WY 82601")
-  ) %>%
+  ) |>
     sub_missing(
     columns = 1:13, 
     missing_text = "--"
-  ) %>% 
+  ) |> 
   summary_rows(
     groups = NULL,
     columns = c(Total),
     fns = list(`Year to date` = ~ sum(., na.rm = TRUE)),
     formatter = fmt_number,
     decimals = 0
-  ) %>%
-  tab_stubhead(label = "Facility (Result ID prefix)") %>%
+  ) |>
+  tab_stubhead(label = "Facility (Result ID prefix)") |>
   tab_options(
     heading.title.font.size = pct(120),
     heading.subtitle.font.size = pct(120),
